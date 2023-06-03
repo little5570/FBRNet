@@ -91,9 +91,9 @@ class AttentionRefine(nn.Module):
         conv_x = self.conv(x)
         return x * conv_x
 
-class arm_ASPP(nn.Module):
+class arASPP(nn.Module):
     def __init__(self, in_channels, atrous_rates):
-        super(arm_ASPP, self).__init__()
+        super(arASPP, self).__init__()
         out_channels = in_channels // 4
         modules = []
         modules.append(nn.Sequential(
@@ -203,9 +203,9 @@ class ContextRe(nn.Module):
         avg = self.sigmoid(avg)
         y = x * avg
         return x * y
-class featurefusion(nn.Module):
+class CSFM(nn.Module):
     def __init__(self,channels):
-        super(featurefusion,self).__init__()
+        super(CSFM,self).__init__()
         self.detial = detialRe(channels)
         self.context = ContextRe(channels)
         self.conv = ConvBNReLU(2 * channels,channels,3,1,1)
@@ -250,9 +250,9 @@ class SpatialAttention(nn.Module):
         out = self.conv1(cat)
         return x * self.sigmoid(out)
 
-class boundrefine(nn.Module):
+class LABRM(nn.Module):
     def __init__(self,in_channels,out_channels,mode = 'train'):
-        super(boundrefine,self).__init__()
+        super(LABRM,self).__init__()
         self.mode = mode
       
         self.conv1 = ConvBNReLU(out_channels,19,1,1,0)
@@ -288,14 +288,14 @@ class ContextPath(nn.Module):
         
         
         self.resnet = Resnet18()
-        self.araspp = arm_ASPP(512,[3,5,7])
+        self.araspp = arASPP(512,[3,5,7])
 #         self.arm16 = AttentionRefinementModule(256, 128)
 #         self.arm32 = AttentionRefinementModule(512, 128)
         
-        self.ffm32_16 = featurefusion(256)
-        self.ffm16_8 = featurefusion(128)
+        self.ffm32_16 = CSFM(256)
+        self.ffm16_8 = CSFM(128)
         
-        self.brm = boundrefine(192,64)
+        self.brm = LABRM(192,64)
         
         self.init_weight()
 
